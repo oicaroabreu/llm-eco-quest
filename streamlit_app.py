@@ -1,43 +1,88 @@
+import os
 import streamlit as st
-from litellm import completion
+import litellm
+import time
 
-st.set_page_config(page_title="🦙💬 Llama 2 Chatbot")
+litellm.set_verbose = True
 
-st.title("Echo Bot")
+st.set_page_config(page_title="🌿 EcoQuest 🌿")
 
-# Initialize chat history
-if "messages" not in st.session_state:
-    st.session_state.messages = [
-    {
-        "role": "system",
-        "content": "The world needs a Solarpunk revolution! Let's exchange some ideas?",
-    },
-    {"role": "assistant", "content": "What do you know about Solarpunk?"},
-]
+st.title("A Solarpunk Future!")
 
-# Display chat messages from history on app rerun
-for message in st.session_state.messages:
-    with st.chat_message(message["role"]):
-        st.markdown(message["content"])
 
-response = completion(
-        model="ollama/llama2",
+def get_assistant_response():
+
+    response = litellm.completion(
+        model="ollama/llama2:13b",
         messages=st.session_state.messages,
         api_base="http://localhost:11434",
-        max_tokens=50,
+        max_tokens=400,
     )
-output = response.choices[0].message.content
-# Display assistant response in chat message container
-with st.chat_message("assistant"):
-    with st.spinner("Thinking..."):
-        st.markdown(output)
-        
-# Add assistant response to chat history
-st.session_state.messages.append({"role": "assistant", "content": output})
+    print(response)
+    return response.choices[0].message.content
 
-# React to user input
-if prompt := st.chat_input("What is up?"):
-    # Display user message in chat message container
-    st.chat_message("user").markdown(prompt)
-    # Add user message to chat history
-    st.session_state.messages.append({"role": "user", "content": prompt})
+
+if "messages" not in st.session_state:
+    st.session_state.messages = [
+        {
+            "role": "system",
+            "content": """Welcome to EcoQuest, a game of environmental problem-solving as a Solarpunk Master. Each level, Local, Regional, and Global, presents unique challenges that require thoughtful and creative solutions.
+                Game Logic:
+                - Introduce a series of environmental challenges at different scales.
+                - Limit to three challenges per level(Local, Regional, and Global) to maintain focus and engagement.
+                - Ensure challenges are unique and randomized for diverse experiences.
+                - Encourage creative and sustainable problem-solving from the player.
+                - Use markdown for engaging content presentation.
+                - Award points and quick recognition for successful solutions with a '🌿CONGRATULATIONS🌿' message after the player's first somewhat satisfying proposal.
+                - Integrate educational content for real-world relevance and learning.
+
+                SUPER IMPORTANT:
+                - Stimulate player interaction by encouraging questions and exploration.
+                - Provide constructive feedback on solutions, guiding players without being overly directive.
+                - Balance the difficulty based on player interaction and responses.
+
+                Player Interaction:
+                - Encourage players to propose initial solutions and expand upon them.
+                - Quickly acknowledge effective ideas with positive reinforcement.
+
+                Dificulty:
+                - Easy, for children
+
+                Goal:
+                - Educate and engage players in sustainable thinking and action.
+
+                Responses:
+                - Short responses, to deepen the knoledge, recommend research points after the `🌿CONGRATULATIONS🌿` message.
+                
+                First Challenge:
+                - Present a unique local level eco challenge focused on a specific environmental issue.
+                - Address a critical issue like water pollution in a river.
+                - Encourage initial problem-solving ideas from the player.
+                - Promptly reward effective solutions with a '🌿CONGRATULATIONS🌿' message to reinforce positive learning and progression."""
+        }
+    ]
+
+for message in st.session_state.messages:
+    if message["role"] != "system":
+        with st.chat_message(message["role"]):
+            st.markdown(message["content"])
+
+if st.session_state.messages[-1]["role"] != "assistant":
+    with st.chat_message("assistant"):
+        with st.spinner("Thinking..."):
+            placeholder = st.empty()
+            assistant_response = get_assistant_response()
+            placeholder.markdown(assistant_response)
+    st.session_state.messages.append(
+        {"role": "assistant", "content": assistant_response}
+    )
+
+
+user_input = st.chat_input(">")
+
+if user_input:
+    with st.chat_message("user"):
+        st.markdown(user_input)
+    time.sleep(0.1)
+    st.session_state.messages.append({"role": "user", "content": user_input})
+    st.rerun()
