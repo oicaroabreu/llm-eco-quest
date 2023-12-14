@@ -7,7 +7,13 @@ litellm.set_verbose = True
 
 st.set_page_config(page_title="🌿 EcoQuest 🌿")
 
-st.title("A Solarpunk Future!")
+with st.sidebar:
+    st.title("🌿 EcoQuest 🌿")
+    st.subheader('A Solarpunk Future!')
+    st.write('An interactive, text-based game designed to inspire and educate players about environmental sustainability and the solarpunk movement.')
+
+    st.markdown('📖 Access our [Github Repository](https://github.com/oicaroabreu/llm-eco-quest/)!')
+
 
 
 def get_assistant_response():
