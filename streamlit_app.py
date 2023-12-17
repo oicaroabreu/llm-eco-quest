@@ -11,6 +11,17 @@ with st.sidebar:
     st.title("🌿 EcoQuest 🌿")
     st.subheader('A Solarpunk Future!')
     st.write('An interactive, text-based game designed to inspire and educate players about environmental sustainability and the solarpunk movement.')
+    if 'OPENAI_API_KEY' in st.secrets:
+        st.success('OpenAI key already provided!', icon='✅')
+        openai_key = st.secrets['OPENAI_API_KEY']
+    else:
+        openai_key = st.text_input('Enter OpenAI API token:', type='password')
+        
+        if not (openai_key and len(openai_key) > 0):
+            st.warning('Please enter your credentials!', icon='⚠️')
+        else:
+            st.success('Now go play the game!!', icon='👉')
+    os.environ['OPENAI_API_KEY'] = openai_key
 
     st.markdown('📖 Access our [Github Repository](https://github.com/oicaroabreu/llm-eco-quest/)!')
 
@@ -19,7 +30,7 @@ with st.sidebar:
 def get_assistant_response():
 
     response = litellm.completion(
-        model="ollama/llama2:13b",
+        model="gpt-3.5-turbo",
         messages=st.session_state.messages,
         api_base="http://localhost:11434",
         max_tokens=400,
