@@ -23,6 +23,12 @@ with st.sidebar:
             st.warning('Please enter your credentials!', icon='⚠️')
         else:
             st.success('Now go play the game!!', icon='👉')
+            if 'messages' in st.session_state:
+                del st.session_state['messages']
+                time.sleep(0.1)
+                st.rerun()
+
+
     os.environ['OPENAI_API_KEY'] = openai_key
 
     st.markdown('📖 Access our [Github Repository](https://github.com/oicaroabreu/llm-eco-quest/)!')
@@ -30,19 +36,22 @@ with st.sidebar:
 
 
 async def get_assistant_response(placeholder):
-
-    response = await litellm.acompletion(
-        model="gpt-3.5-turbo",
-        messages=st.session_state.messages,
-        max_tokens=400,
-        stream=True
-    )
-    full_response = ""
-    async for chunk in response:
-        pprint(chunk)
-        full_response += str(chunk['choices'][0]['delta']['content'])
-        time.sleep(0.05)
-        placeholder.markdown(full_response)
+    try:
+        response = await litellm.acompletion(
+            model="gpt-3.5-turbo",
+            messages=st.session_state.messages,
+            max_tokens=400,
+            stream=True
+        )
+        full_response = ""
+        async for chunk in response:
+            pprint(chunk)
+            full_response += str(chunk['choices'][0]['delta']['content'])
+            time.sleep(0.05)
+            placeholder.markdown(full_response)
+    except Exception as e:
+        st.warning("Please enter your credentials", icon='👈')
+        return "Sorry, an error occurred."
 
     return full_response
 
