@@ -2,6 +2,8 @@ import os
 import streamlit as st
 import litellm
 import time
+import asyncio
+from pprint import pprint
 
 litellm.set_verbose = True
 
@@ -27,16 +29,22 @@ with st.sidebar:
 
 
 
-def get_assistant_response():
+async def get_assistant_response(placeholder):
 
-    response = litellm.completion(
+    response = await litellm.acompletion(
         model="gpt-3.5-turbo",
         messages=st.session_state.messages,
-        api_base="http://localhost:11434",
         max_tokens=400,
+        stream=True
     )
-    print(response)
-    return response.choices[0].message.content
+    full_response = ""
+    async for chunk in response:
+        pprint(chunk)
+        full_response += str(chunk['choices'][0]['delta']['content'])
+        time.sleep(0.05)
+        placeholder.markdown(full_response)
+
+    return full_response
 
 
 if "messages" not in st.session_state:
@@ -88,7 +96,7 @@ if st.session_state.messages[-1]["role"] != "assistant":
     with st.chat_message("assistant"):
         with st.spinner("Thinking..."):
             placeholder = st.empty()
-            assistant_response = get_assistant_response()
+            assistant_response = asyncio.run(get_assistant_response(placeholder))
             placeholder.markdown(assistant_response)
     st.session_state.messages.append(
         {"role": "assistant", "content": assistant_response}

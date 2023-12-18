@@ -4,6 +4,7 @@ altair==5.2.0 ; python_full_version >= "3.11.3" and python_full_version < "4.0.0
 annotated-types==0.6.0 ; python_full_version >= "3.11.3" and python_version < "4.0"
 anyio==4.1.0 ; python_full_version >= "3.11.3" and python_version < "4.0"
 appdirs==1.4.4 ; python_full_version >= "3.11.3" and python_version < "4.0"
+async-generator==1.10 ; python_full_version >= "3.11.3" and python_full_version < "4.0.0"
 attrs==23.1.0 ; python_full_version >= "3.11.3" and python_version < "4.0"
 blinker==1.7.0 ; python_full_version >= "3.11.3" and python_full_version < "4.0.0"
 cachetools==5.3.2 ; python_full_version >= "3.11.3" and python_full_version < "4.0.0"
